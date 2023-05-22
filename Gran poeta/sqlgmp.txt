@@ -1,0 +1,130 @@
+--------------------   Tablas  --------------------------
+
+-- Crear tabla de usuarios
+CREATE TABLE Usuarios (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  nombre VARCHAR(50),
+  contraseña VARCHAR(50),
+  perfil ENUM('JefeBodega', 'Bodeguero')
+);
+
+-- Crear tabla de editoriales
+CREATE TABLE Editoriales (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  nombre VARCHAR(50)
+);
+
+-- Crear tabla de autores
+CREATE TABLE Autores (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  nombre VARCHAR(50)
+);
+
+-- Crear tabla de productos
+CREATE TABLE Productos (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  nombre_producto VARCHAR(50),
+  tipo ENUM('Libro', 'Revista', 'Enciclopedia'),
+  editorial_id INT,
+  FOREIGN KEY (editorial_id) REFERENCES Editoriales(id),
+  descripcion TEXT
+);
+
+-- Crear tabla de autores de productos
+CREATE TABLE AutoresProductos (
+  autor_id INT,
+  producto_id INT,
+  FOREIGN KEY (autor_id) REFERENCES Autores(id),
+  FOREIGN KEY (producto_id) REFERENCES Productos(id),
+  PRIMARY KEY (autor_id, producto_id)
+);
+
+-- Crear tabla de bodegas
+CREATE TABLE Bodegas (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  nombre VARCHAR(50),
+  jefe_bodega_id INT,
+  FOREIGN KEY (jefe_bodega_id) REFERENCES Usuarios(id)
+);
+
+-- Crear tabla de movimientos de bodega
+CREATE TABLE Movimientos (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  bodega_origen_id INT,
+  bodega_destino_id INT,
+  usuario_id INT,
+  FOREIGN KEY (bodega_origen_id) REFERENCES Bodegas(id),
+  FOREIGN KEY (bodega_destino_id) REFERENCES Bodegas(id),
+  FOREIGN KEY (usuario_id) REFERENCES Usuarios(id)
+);
+
+-- Crear tabla de productos en movimientos de bodega
+CREATE TABLE ProductosMovimientos (
+  movimiento_id INT,
+  producto_id INT,
+  cantidad INT,
+  FOREIGN KEY (movimiento_id) REFERENCES Movimientos(id),
+  FOREIGN KEY (producto_id) REFERENCES Productos(id),
+  PRIMARY KEY (movimiento_id, producto_id)
+);
+
+
+
+
+
+------------------------------------ INSERT ---------------------------------------
+
+
+
+-- Insertar datos de ejemplo en la tabla Usuarios
+INSERT INTO Usuarios (nombre, contraseña, perfil)
+VALUES
+  ('JefeBodega', 'password1', 'JefeBodega'),
+  ('Bodeguero', 'password2', 'Bodeguero');
+
+-- Insertar datos de ejemplo en la tabla Editoriales
+INSERT INTO Editoriales (nombre)
+VALUES
+  ('Editorial 1'),
+  ('Editorial 2');
+
+-- Insertar datos de ejemplo en la tabla Autores
+INSERT INTO Autores (nombre)
+VALUES
+  ('Autor 1'),
+  ('Autor 2');
+
+-- Insertar datos de ejemplo en la tabla Productos
+INSERT INTO Productos (tipo, editorial_id, descripcion)
+VALUES
+  ('Libro', 1, 'Descripción del Libro 1'),
+  ('Revista', 1, 'Descripción de la Revista 1'),
+  ('Enciclopedia', 2, 'Descripción de la Enciclopedia 1');
+
+-- Insertar datos de ejemplo en la tabla AutoresProductos
+INSERT INTO AutoresProductos (autor_id, producto_id)
+VALUES
+  (1, 1), -- Autor 1 relacionado con Libro 1
+  (2, 1), -- Autor 2 relacionado con Libro 1
+  (1, 2); -- Autor 1 relacionado con Revista 1
+
+-- Insertar datos de ejemplo en la tabla Bodegas
+INSERT INTO Bodegas (nombre, jefe_bodega_id)
+VALUES
+  ('Bodega 1', 1),
+  ('Bodega 2', 1),
+  ('Bodega 3', 2);
+
+-- Insertar datos de ejemplo en la tabla Movimientos
+INSERT INTO Movimientos (bodega_origen_id, bodega_destino_id, usuario_id)
+VALUES
+  (1, 2, 2), -- Movimiento de Bodega 1 a Bodega 2 por el Bodeguero
+  (2, 3, 2); -- Movimiento de Bodega 2 a Bodega 3 por el Bodeguero
+
+-- Insertar datos de ejemplo en la tabla ProductosMovimientos
+INSERT INTO ProductosMovimientos (movimiento_id, producto_id, cantidad)
+VALUES
+  (1, 1, 5), -- Libro 1, 5 unidades en el Movimiento 1
+  (1, 2, 10), -- Revista 1, 10 unidades en el Movimiento 1
+  (2, 1, 3); -- Libro 1, 3 unidades en el Movimiento 2
